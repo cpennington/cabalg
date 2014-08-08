@@ -41,8 +41,10 @@ fetch urlAndMaybeRevision = do
       url = takeWhile (/= '@') urlAndMaybeRevision
 
 cabalInstall :: [String] -> Maybe String -> IO ()
-cabalInstall cabalFiles args = void $ createProcess process
-  where process = proc "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args))
+cabalInstall cabalFiles args = do
+  let process = proc "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args))
+  (_, _, _, procHandle) <- createProcess process
+  void $ waitForProcess procHandle
 
 repoName :: String -> String
 repoName = takeWhile (/= '@') . lastSplitOn '/'
