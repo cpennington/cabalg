@@ -40,7 +40,9 @@ fetch urlAndMaybeRevision = do
       url = takeWhile (/= '@') urlAndMaybeRevision
 
 cabalInstall :: [String] -> Maybe String -> IO ()
-cabalInstall cabalFiles args = putStrLn =<< readProcess "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args)) []
+cabalInstall cabalFiles args = createProcess proc {delegate_ctrlc = True}
+  process = proc "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args)) []
+}
 
 repoName :: String -> String
 repoName = takeWhile (/= '@') . lastSplitOn '/'
